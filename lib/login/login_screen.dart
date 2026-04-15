@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/custom_text_field.dart';
 import 'otp_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -11,15 +12,7 @@ class LoginScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login",style: TextStyle(color: Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        backgroundColor: Color(0xFF4CAF50),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFFFFFFFF)),
-      ),
+        title: const Text("Login")),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -29,24 +22,14 @@ class LoginScreen extends StatelessWidget {
 
 
             const SizedBox(height: 20),
-            TextField(
+            CustomTextField(
               controller: phoneController,
+              label: "Mobile Number",
+              hint: "Enter your mobile number",
+              icon: Icons.phone,
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: "Mobile Number",
-                labelStyle: TextStyle(color: Color(0xFF333333)),
-                hintText: "Enter your mobile number",
-                prefixIcon: Icon(Icons.phone, color: Color(0xFF333333)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Color(0xFF333333), width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Color(0xFF0B3E11), width: 2),
-                ),
-              ),
             ),
+
             const SizedBox(height: 12),
 
             SizedBox(

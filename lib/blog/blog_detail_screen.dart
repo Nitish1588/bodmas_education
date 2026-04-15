@@ -10,18 +10,24 @@ class BlogDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String cleanedContent = blog["content"] ?? "";
 
+// remove enquiry form
+    cleanedContent = cleanedContent.replaceAll("[enquiry-form]", "");
+
+// remove only Froala text, not full tag
+    cleanedContent = cleanedContent.replaceAll(
+      RegExp(r'<p[^>]*>[^<]*Powered by\s*<a[^>]*>Froala Editor<\/a><\/p>', caseSensitive: false),
+      "",
+    );
     return Scaffold(
 
       appBar: AppBar(
-        title: Text(blog["title"],style: TextStyle(color: Color(0xFFFFFFFF),
+        title: Text(blog["title"],style: TextStyle(
           fontSize: 17,
-          fontWeight: FontWeight.w500,
         ),
         ),
-        backgroundColor: Color(0xFF4CAF50),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFFFFFFFF)),
+
       ),
 
       body: SingleChildScrollView(
@@ -52,8 +58,9 @@ class BlogDetailScreen extends StatelessWidget {
             //   blog["content"] ?? "",
             //   style: const TextStyle(fontSize: 16),
             // ),
+
             Html(
-              data: blog["content"],
+              data: cleanedContent,
 
               extensions: const [
                 TableHtmlExtension(),

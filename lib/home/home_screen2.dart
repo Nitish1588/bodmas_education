@@ -57,16 +57,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text(
-          "Bodmas Education",style: TextStyle(color: Color(0xFFFFFFFF),
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-        ),
-        ),
-        backgroundColor: Color(0xFF4CAF50),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFFFFFFFF)),
-      ),
+        title: const Text("Bodmas Education")),
 
       body: Padding(
         padding: const EdgeInsets.all(15),

@@ -1,6 +1,6 @@
+import 'package:bodmas_education/login/user_info_sheet.dart';
 import 'package:flutter/material.dart';
-
-import '../home/home_screen.dart';
+import 'widgets/custom_text_field.dart';
 
 
 class OTPScreen extends StatelessWidget {
@@ -16,15 +16,7 @@ class OTPScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("OTP Verification",style: TextStyle(color: Color(0xFFFFFFFF),
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-        ),
-        ),
-        backgroundColor: Color(0xFF4CAF50),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFFFFFFFF)),
-      ),
+        title: const Text("OTP Verification")),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -36,25 +28,14 @@ class OTPScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-
-            TextField(
+            CustomTextField(
               controller: otpController,
+              label: "Mobile Number",
+              hint: "Enter your mobile number",
+              icon: Icons.password,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Enter OTP",
-                labelStyle: TextStyle(color: Color(0xFF333333)),
-                //hintText: "Enter OTP",
-                //prefixIcon: Icon(Icons.confirmation_number, color: Color(0xFF333333)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Color(0xFF333333), width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Color(0xFF0B3E11), width: 2),
-                ),
-              ),
             ),
+
             const SizedBox(height: 20),
 
             SizedBox(
@@ -68,9 +49,17 @@ class OTPScreen extends StatelessWidget {
                 child: const Text("Verify OTP"),
                 onPressed: () {
 
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    isDismissible: false,
+                    enableDrag: false,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      return const UserInfoSheet();
+                    },
                   );
 
                 },
@@ -83,3 +72,4 @@ class OTPScreen extends StatelessWidget {
     );
   }
 }
+

@@ -1,16 +1,17 @@
+import 'package:bodmas_education/event/event_screen.dart';
 import 'package:flutter/material.dart';
-import '../blog/blog_service.dart';
-import '../blog/widgets/blog_card.dart';
-import '../blog/widgets/blog_card_skeleton.dart';
+import 'blog_service.dart';
+import 'widgets/blog_card.dart';
+import 'widgets/blog_card_skeleton.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class BlogScreen extends StatefulWidget {
+  const BlogScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<BlogScreen> createState() => _BlogScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _BlogScreenState extends State<BlogScreen> {
 
   List blogs = [];
   bool initialLoading = true;
@@ -59,14 +60,20 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fetchBlogs();
   }
+  Future<void> refreshBlogs() async {
+    page = 1;
+    blogs.clear();
+    hasMore = true;
 
+    await fetchBlogs();
+  }
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text("Home")),
+        title: const Text("Blogs")),
 
       body: Padding(
         padding: const EdgeInsets.all(10),
@@ -74,13 +81,34 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
 
+            // SizedBox(
+            //   width: double.infinity,
+            //   height: 45,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color(0xFF4CAF50), // Green background
+            //       foregroundColor: const Color(0xFFFFFFFF), // White text
+            //     ),
+            //     child: const Text("Home-2"),
+            //     onPressed: () {
+            //
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (_) => const HomeScreen2()),
+            //       );
+            //
+            //     },
+            //   ),
+            // ),
+
+
 
             /// BLOG GRID
             Expanded(
 
-              child: initialLoading
-
-              /// FIRST LOAD SKELETON
+                child: RefreshIndicator(
+                  onRefresh: refreshBlogs,
+                  child: initialLoading
 
                   ? GridView.builder(
                 itemCount: 10,
@@ -133,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-
+            ),
             const SizedBox(height: 10),
 
             /// LOAD MORE BUTTON
@@ -149,8 +177,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: fetchBlogs,
                   child: const Text("Load More"),
                 ),
-              )
+              ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              height: 45,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4CAF50), // Green background
+                  foregroundColor: const Color(0xFFFFFFFF), // White text
+                ),
+                child: const Text("Events"),
+                onPressed: () {
 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const EventScreen()),
+                  );
+
+                },
+              ),
+            ),
           ],
         ),
       ),

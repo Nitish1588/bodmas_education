@@ -24,15 +24,7 @@ class _EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Events",style: TextStyle(color: Color(0xFFFFFFFF),
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-        ),
-        ),
-        backgroundColor: Color(0xFF4CAF50),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFFFFFFFF)),
-      ),
+        title: const Text("Events")),
       backgroundColor: Colors.white,
 
       body: FutureBuilder<List<dynamic>>(
@@ -52,13 +44,7 @@ class _EventScreenState extends State<EventScreen> {
 
           // ❌ ERROR
           if (snapshot.hasError) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: 6, // number of skeleton cards
-              itemBuilder: (context, index) {
-                return const EventCardSkeleton();
-              },
-            );
+            return const Center(child: Text("Error loading events"));
           }
 
           // ✅ DATA

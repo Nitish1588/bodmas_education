@@ -26,6 +26,7 @@ class BlogCardSkeleton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white, // 👈 White
                 borderRadius: BorderRadius.circular(6),
+
               ),
             ),
 

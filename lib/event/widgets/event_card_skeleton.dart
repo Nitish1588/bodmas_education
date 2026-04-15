@@ -21,7 +21,7 @@ class EventCardSkeleton extends StatelessWidget {
           children: [
             // 🔹 TITLE
             Container(
-              height: 16,
+              height: 170,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,

@@ -11,11 +11,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Education App',
+
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF4BAE4F),
+          titleTextStyle: TextStyle(
+            color: Color(0xFFFFFFFF),
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+          ),
+          iconTheme: IconThemeData(color: Color(0xFFFFFFFF),),
+
+        ),
       ),
+      debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
     );
   }
