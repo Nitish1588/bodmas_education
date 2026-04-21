@@ -123,6 +123,8 @@ class _BlogScreenState extends State<BlogScreen> {
 
                 itemBuilder: (context,index){
 
+
+
                   return const BlogCardSkeleton();
 
                 },
@@ -141,7 +143,7 @@ class _BlogScreenState extends State<BlogScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
-                  childAspectRatio: 0.9,
+                  childAspectRatio: 0.85,
                 ),
 
                 itemBuilder: (context,index){

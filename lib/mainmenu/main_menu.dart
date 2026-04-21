@@ -3,6 +3,7 @@ import 'package:bodmas_education/cutoff/cut_off.dart';
 import 'package:bodmas_education/home/home_screen.dart';
 import 'package:bodmas_education/meeting/meeting_screen.dart';
 import 'package:bodmas_education/notification/notification_screen.dart';
+import 'package:bodmas_education/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class MainMenu extends StatefulWidget {
@@ -17,19 +18,20 @@ class _MainMenuState extends State<MainMenu> {
 
   final List<Widget> screens = [
     HomeScreen(),
+    MeetingScreen(),
     CutOffScreen(),
     NotificationScreen(),
     BlogScreen(),
-    MeetingScreen(),
-    const Center(child: Text("Profile Screen")),
+    ProfileScreen(),
+    //const Center(child: Text("Profile Screen")),
   ];
 
   final List<MenuItemModel> menuItems = [
     MenuItemModel(icon: Icons.home, label: "Home"),
+    MenuItemModel(icon: Icons.video_call, label: "121 session"),
     MenuItemModel(icon: Icons.school, label: "Cut-off"),
     MenuItemModel(icon: Icons.notifications, label: "Notification"),
     MenuItemModel(icon: Icons.article, label: "Blog"),
-    MenuItemModel(icon: Icons.video_call, label: "121 session"),
     MenuItemModel(icon: Icons.person, label: "Profile"),
   ];
 

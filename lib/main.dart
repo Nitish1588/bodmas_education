@@ -14,10 +14,13 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         appBarTheme: AppBarTheme(
+
+         //leadingWidth: 40, // 👈 icon  width
+         // titleSpacing: 0,
           backgroundColor: Color(0xFF4BAE4F),
           titleTextStyle: TextStyle(
             color: Color(0xFFFFFFFF),
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
           iconTheme: IconThemeData(color: Color(0xFFFFFFFF),),

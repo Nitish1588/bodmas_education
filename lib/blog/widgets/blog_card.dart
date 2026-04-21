@@ -60,13 +60,16 @@ class BlogCard extends StatelessWidget {
             /// AUTHOR + DATE
             Row(
               children: [
-
                 const Icon(Icons.person, size: 14, color: Color(0xFF666666)),
-                const SizedBox(width: 3),
+                const SizedBox(width: 4),
 
+                // Author text flexible
                 Expanded(
+                  flex: 2,
                   child: Text(
                     blog["author"] ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 10,
                       color: Color(0xFF666666),
@@ -74,16 +77,25 @@ class BlogCard extends StatelessWidget {
                   ),
                 ),
 
+                const SizedBox(width: 6),
+
                 const Icon(Icons.calendar_today,
                     size: 14, color: Color(0xFF666666)),
 
-                const SizedBox(width: 3),
+                const SizedBox(width: 4),
 
-                Text(
-                  date,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFF666666),
+                // Date text flexible
+                Flexible(
+                  flex: 1,
+                  child: Text(
+                    date,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF666666),
+                    ),
                   ),
                 ),
               ],
