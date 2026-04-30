@@ -4,6 +4,7 @@ import 'package:bodmas_education/home/home_screen.dart';
 import 'package:bodmas_education/meeting/meeting_screen.dart';
 import 'package:bodmas_education/notification/notification_screen.dart';
 import 'package:bodmas_education/profile/profile_screen.dart';
+import 'package:bodmas_education/service/service.dart';
 import 'package:flutter/material.dart';
 
 class MainMenu extends StatefulWidget {
@@ -18,6 +19,7 @@ class _MainMenuState extends State<MainMenu> {
 
   final List<Widget> screens = [
     HomeScreen(),
+    ServicesScreen(),
     MeetingScreen(),
     CutOffScreen(),
     NotificationScreen(),
@@ -28,6 +30,7 @@ class _MainMenuState extends State<MainMenu> {
 
   final List<MenuItemModel> menuItems = [
     MenuItemModel(icon: Icons.home, label: "Home"),
+    MenuItemModel(icon: Icons.miscellaneous_services, label: "Services"),
     MenuItemModel(icon: Icons.video_call, label: "121 session"),
     MenuItemModel(icon: Icons.school, label: "Cut-off"),
     MenuItemModel(icon: Icons.notifications, label: "Notification"),
@@ -38,11 +41,11 @@ class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: selectedIndex == 0, // 👈 only home can exit
+      canPop: selectedIndex == 0, // only home can exit
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && selectedIndex != 0) {
           setState(() {
-            selectedIndex = 0; // 👈 go to home first
+            selectedIndex = 0; // go to home first
           });
         }
       },
@@ -114,14 +117,14 @@ class CustomNavBar extends StatelessWidget {
         ),
         child: Scrollbar(
           controller: scrollController,
-          thumbVisibility: true, // 👈 always visible
+          thumbVisibility: true, // always visible
           trackVisibility: false,
           thickness: 4,
           radius: Radius.circular(20),
           child: SingleChildScrollView(
             controller: scrollController,
             scrollDirection: Axis.horizontal,
-            physics: BouncingScrollPhysics(), // 👈 smooth feel
+            physics: BouncingScrollPhysics(), // smooth feel
             child: Row(
               children: List.generate(items.length, (index) {
                 final isSelected = selectedIndex == index;

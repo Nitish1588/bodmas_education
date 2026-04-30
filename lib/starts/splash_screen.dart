@@ -1,6 +1,7 @@
-import 'dart:async';
+import 'package:bodmas_education/starts/get_started.dart';
 import 'package:flutter/material.dart';
-import 'get_started.dart';
+import 'package:bodmas_education/mainmenu/main_menu.dart';
+import '../login/services/session.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,37 +15,85 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    checkLogin();
+  }
 
-    Timer(const Duration(seconds: 1), () {
+  void checkLogin() async {
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    String? token = await Session.getToken();
+
+    if (!mounted) return;
+
+    if (token != null && token.isNotEmpty) {
+
+      // 🔐 Already Logged In
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainMenu()),
+      );
+
+    } else {
+
+      // ❌ Not Logged In
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const GetStarted()),
       );
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Image Widget
-            Image.asset(
-              'assets/images/img.png',
-              // width: 150,
-              // height: 150,
-            ),
-            const SizedBox(height: 20), // Image aur Text ke beech spacing
-            const Text(
-              "Bodmas Education",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: 1),
+          duration: Duration(seconds: 2),
+          builder: (context, value, child) {
+            return ShaderMask(
+              shaderCallback: (bounds) {
+                return LinearGradient(
+                  begin: Alignment(value * 2 - 1, 0),
+                  end: Alignment(-value * 2 + 1, 0),
+                  colors: [
+                    Colors.blue,
+                    Colors.lightBlueAccent,
+                    Colors.cyan,
+                    Colors.blueAccent,
+                  ],
+                ).createShader(bounds);
+              },
+              child: Text(
+                "BODMAS EDUCATION",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 3,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 5,
+                      color: Colors.blueAccent.withValues(alpha: 0.6),
+                      offset: Offset(0, 0),
+                    ),
+                    Shadow(
+                      blurRadius: 30,
+                      color: Colors.cyan.withValues(alpha: 0.3),
+                      offset: Offset(0, 0),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            );
+          },
+          onEnd: () {
+            Future.delayed(Duration.zero, () {
+              (context as Element).markNeedsBuild();
+            });
+          },
         ),
       ),
     );

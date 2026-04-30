@@ -1,4 +1,6 @@
+import 'package:bodmas_education/login/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import '../widgets/app_snackbar.dart';
 import 'widgets/custom_text_field.dart';
 import 'otp_screen.dart';
 
@@ -40,12 +42,48 @@ class LoginScreen extends StatelessWidget {
                   backgroundColor: const Color(0xFF4CAF50), // Green background
                   foregroundColor: const Color(0xFFFFFFFF), // White text
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => OTPScreen(phone: phoneController.text)),
-                  );
-                },
+                  onPressed: () async {
+                    String phone = phoneController.text.trim();
+                    if (phone.isEmpty) {
+                      AppSnackBar.show(
+                        context,
+                        message: "Phone number is required",
+                        type: SnackBarType.error,
+                      );
+                      return;
+                    } else if (phone.length != 10) {
+                      AppSnackBar.show(
+                        context,
+                        message: "Enter valid 10-digit phone number",
+                        type: SnackBarType.warning,
+                      );
+                      return;
+                    }
+                    bool success = await AuthService.sendOtp(phoneController.text);
+
+                    if (success) {
+
+                      AppSnackBar.show(
+                      context,
+                      message: "OTP sent successfully to your Mobile No",
+                      type: SnackBarType.success,
+                    );
+
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OTPScreen(phone: phoneController.text),
+                        ),
+                      );
+                    } else {
+                      AppSnackBar.show(
+                        context,
+                        message: "Failed to send OTP",
+                        type:SnackBarType.error,
+                      );
+                    }
+                  },
                 child: const Text("Send OTP"),
               ),
             )
