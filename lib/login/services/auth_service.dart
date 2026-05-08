@@ -65,6 +65,46 @@ class AuthService {
     return jsonDecode(res.body);
   }
 
+
+  // GET USER (ME API)
+  static Future<Map<String, dynamic>?> getMe(String token) async {
+
+    print("SENDING TOKEN: $token");
+
+    final res = await http.get(
+      Uri.parse("$baseUrl/me"),
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    print("STATUS: ${res.statusCode}");
+    print("BODY: ${res.body}");
+
+    return jsonDecode(res.body);
+  }
+  static Future<Map<String, dynamic>?> getUser(String token) async {
+    try {
+      final res = await http.get(
+        Uri.parse("$baseUrl/me"),
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
+
+      print("ME STATUS: ${res.statusCode}");
+      print("ME BODY: ${res.body}");
+
+      return jsonDecode(res.body);
+
+    } catch (e) {
+      print("GET USER ERROR: $e");
+      return null;
+    }
+  }
+
   // LOGOUT
   static Future<bool> logout(String token) async {
     final res = await http.post(

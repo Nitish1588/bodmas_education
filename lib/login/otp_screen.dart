@@ -97,6 +97,13 @@ class OTPScreen extends StatelessWidget {
                         String token = res["token"];
                         await Session.saveToken(token);
 
+                        //await Session.saveUser(response["student"]);
+
+                        var me = await AuthService.getMe(token);
+                        if (me != null) {
+                          await Session.saveUser(me["student"]);
+                        }
+
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (_) => MainMenu()),

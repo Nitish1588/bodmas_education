@@ -67,7 +67,15 @@ class UserInfoSheet extends StatelessWidget {
                   AppSnackBar.show(context, message: "Login Successfully",
                   type: SnackBarType.success);
 
-                  await Session.saveToken(res["token"]);
+                 // await Session.saveToken(res["token"]);
+
+                  String token = res["token"];
+                  await Session.saveToken(token);
+
+                  var me = await AuthService.getMe(token);
+                  if (me != null) {
+                    await Session.saveUser(me["student"]);
+                  }
 
                   Navigator.pushAndRemoveUntil(
                     context,

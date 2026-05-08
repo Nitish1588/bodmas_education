@@ -27,6 +27,8 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (token != null && token.isNotEmpty) {
+      await Session.getToken();
+      await Session.getUser();
 
       // 🔐 Already Logged In
       Navigator.pushReplacement(

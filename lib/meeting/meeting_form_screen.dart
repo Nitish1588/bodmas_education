@@ -1,5 +1,9 @@
+import 'package:bodmas_education/meeting/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'field_widget.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'meeting_model.dart';
 
 class MeetingFormScreen extends StatefulWidget {
   const MeetingFormScreen({super.key});
@@ -9,41 +13,80 @@ class MeetingFormScreen extends StatefulWidget {
 }
 
 class _MeetingFormScreenState extends State<MeetingFormScreen> {
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final queryController = TextEditingController();
+  final rankController = TextEditingController();
+
+
   String? selectedMode;
   String? selectedCourse;
 
-  final Map<String, List<Map<String, dynamic>>> courseData = {
-    "Online": [
-      {"title": "BDS | BAMS | BUMS | BHMS | Veterinary", "price": 1000},
-      {"title": "MBBS", "price": 1000},
-      {"title": "MD | MS | DNB", "price": 1000},
-      {"title": "B.Tech | M.Tech | Polytechnic", "price": 1000},
-      {"title": "MBBS ABROAD", "price": 1000},
-      {"title": "BBA | BMS | BBA+MBA | BA LLB | BBA LLB", "price": 1000},
-      {"title": "MDS & AIAPGET", "price": 1000},
-    ],
-    "Offline": [
-      {"title": "MBBS", "price": 1500},
-      {"title": "Ayush | Dental | Engineering | Law & Management", "price": 1000},
-      {"title": "MD/MS", "price": 1500},
-    ],
-  };
+  List<CourseModel> allCourses = [];
+  List<CourseModel> filteredCourses = [];
+  CourseModel? selectedCourseObj;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCourses();
+  }
+
+  Future<void> fetchCourses() async {
+    setState(() => isLoading = true);
+
+    final response = await http.get(
+      Uri.parse("https://bodmaseducation.com/api/v1/courses"),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      List list = data['data'];
+
+      allCourses = list.map((e) => CourseModel.fromJson(e)).toList();
+    }
+
+    setState(() => isLoading = false);
+  }
+
+  bool isExpanded = false;
+
+
+
   DateTime? selectedDate;
   String? selectedTimeSlot;
 
-  final List<String> timeSlots = [
-    "08:00 AM",
-    "09:00 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "12:00 PM",
-    "01:00 PM",
-    "02:00 PM",
-    "02:00 PM",
-    "04:00 PM",
-    "05:00 PM",
-    "06:00 PM",
-  ];
+  List<TimeSlotModel> allSlots = [];
+  List<TimeSlotModel> availableSlots = [];
+  TimeSlotModel? selectedSlot;
+
+  bool isSlotLoading = false;
+
+  Future<void> fetchTimeSlots(String date) async {
+    setState(() => isSlotLoading = true);
+
+    final response = await http.get(
+      Uri.parse("https://bodmaseducation.com/api/v1/time-slots?date=$date"),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      List list = data['data'];
+
+      allSlots = list.map((e) => TimeSlotModel.fromJson(e)).toList();
+
+      // Only available slots
+      availableSlots =
+          allSlots.where((slot) => slot.status == "available").toList();
+    }
+
+    setState(() => isSlotLoading = false);
+  }
 
   Future<void> pickDate() async {
     DateTime? picked = await showDatePicker(
@@ -56,8 +99,90 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
     if (picked != null) {
       setState(() {
         selectedDate = picked;
-        selectedTimeSlot = null; // reset time
+        selectedSlot = null;
       });
+
+      // 👉 format: YYYY-MM-DD
+      String formattedDate =
+          "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+
+      await fetchTimeSlots(formattedDate);
+    }
+  }
+
+  Future<void> createBooking() async {
+
+    // ✅ validation
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        phoneController.text.isEmpty ||
+        selectedCourseObj == null ||
+        selectedSlot == null ||
+        selectedDate == null ||
+        selectedMode == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill all required fields")),
+      );
+      return;
+    }
+
+    String formattedDate =
+        "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}";
+
+    final body = {
+      "type": selectedMode == "Online" ? "1" : "2",
+      "user": nameController.text,
+      "number": phoneController.text,
+      "email": emailController.text,
+      "course_id": selectedCourseObj!.id.toString(),
+      "date": formattedDate,
+      "time_slot_id": selectedSlot!.id.toString(),
+      "user-id": "2",
+      "price": selectedCourseObj!.price.toString(),
+    };
+
+    final response = await http.post(
+      Uri.parse("https://bodmaseducation.com/api/v1/booking/create"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
+    );
+
+    // final data = json.decode(response.body);
+    debugPrint("📥 RAW RESPONSE:");
+    debugPrint(response.body);
+
+    debugPrint("📥 STATUS CODE: ${response.statusCode}");
+
+    if (response.statusCode != 200) {
+      debugPrint("❌ SERVER ERROR");
+      return;
+    }
+
+    if (!response.body.trim().startsWith("{")) {
+      debugPrint("❌ NOT JSON RESPONSE");
+      return;
+    }
+
+    final data = json.decode(response.body);
+
+    if (data['status'] == true) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PaymentScreen(
+            bookingId: data['data']['booking_id'],
+            orderId: data['data']['razorpay_order_id'],
+            amount: data['data']['amount'],
+            name: nameController.text,
+            email: emailController.text,
+            phone: phoneController.text,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['message'])),
+      );
     }
   }
   @override
@@ -72,6 +197,7 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+
             // Title
             Text(
               "Book Your Meeting with Ashok Sir",
@@ -104,16 +230,16 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                 children: [
 
                   /// 👤 Name + Email
-                  inputField("Name", Icons.person),
+                  inputField("Name", Icons.person,controller: nameController),
 
                   const SizedBox(height: 5),
 
-                  inputField("Email", Icons.email,keyboardType: TextInputType.emailAddress),
+                  inputField("Email", Icons.email,controller: emailController,keyboardType: TextInputType.emailAddress),
 
                   const SizedBox(height: 5),
 
                   /// 📞 Phone + Mode
-                  inputField("Number", Icons.phone,keyboardType: TextInputType.number),
+                  inputField("Number", Icons.phone,controller: phoneController,keyboardType: TextInputType.number),
                   const SizedBox(height: 5),
                   dropdownField(
                     label: "Mode",
@@ -121,8 +247,16 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                     items: ["Online", "Offline"],
                     onChanged: (val) {
                       setState(() {
+
+
                         selectedMode = val;
                         selectedCourse = null;
+                        selectedCourseObj = null;
+
+                        int type = val == "Online" ? 1 : 2;
+
+                        filteredCourses =
+                            allCourses.where((course) => course.type == type).toList();
                       });
                     },
                   ),
@@ -135,19 +269,91 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                     child: dropdownField(
                       label: "Course",
                       value: selectedCourse,
-                      items: selectedMode == null
-                          ? []
-                          : courseData[selectedMode!]!
-                          .map((e) =>
-                      "${e['title']} - ₹${e['price']}")
+                      items: filteredCourses
+                          .map((e) => "${e.name} - ₹${e.price}")
                           .toList(),
                       onChanged: (val) {
-                        setState(() => selectedCourse = val);
+                        setState(() {
+                          selectedCourse = val;
+
+                          selectedCourseObj = filteredCourses.firstWhere(
+                                (e) => "${e.name} - ₹${e.price}" == val,
+                          );
+                        });
                       },
                     ),
                   ),
+
+                  if (selectedCourseObj != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedCourseObj!.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              "₹${selectedCourseObj!.price}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Text(
+                          "Description",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 5),
+
+
+                        Text(
+                          isExpanded
+                              ? selectedCourseObj!.description
+                              .replaceAll("\r\n\r\n\r\n", "\n")
+                              .replaceAll("\r\n\r\n", "\n")
+                              : selectedCourseObj!.description
+                              .replaceAll("\r\n\r\n\r\n", "\n")
+                              .replaceAll("\r\n\r\n", "\n")
+                              .length >120
+                              ? "${selectedCourseObj!.description
+                              .replaceAll("\r\n\r\n\r\n", "\n")
+                              .replaceAll("\r\n\r\n", "\n")
+                              .substring(0, 120)}..."
+                              : selectedCourseObj!.description
+                              .replaceAll("\r\n\r\n\r\n", "\n")
+                              .replaceAll("\r\n\r\n", "\n"),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            setState(() => isExpanded = !isExpanded);
+                          },
+                          child: Text(
+                            isExpanded ? "Read Less" : "Read More",
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 5),
-                  inputField("Rank/Score", Icons.star,keyboardType: TextInputType.datetime),
+
+                  inputField("Rank/Score", Icons.star,keyboardType: TextInputType.datetime, controller: rankController),
 
                   const SizedBox(height: 5),
 
@@ -159,7 +365,7 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                         child: GestureDetector(
                           onTap: pickDate,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
                             decoration: BoxDecoration(
 
                               color: Colors.grey.shade100,
@@ -171,12 +377,17 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.calendar_today),
+                                const Icon(Icons.calendar_today, color: Color(0xFF333333), ),
                                 const SizedBox(width: 10),
                                 Text(
                                   selectedDate == null
                                       ? "Select Date"
                                       : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                                  style: TextStyle(
+                                   // fontSize: 16,            // 👉 text size
+                                    color: Color(0xFF333333),   // 👉 text color
+                                   // fontWeight: FontWeight.w400, // optional
+                                  ),
                                 ),
                               ],
                             ),
@@ -190,25 +401,55 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           isExpanded: true,
-                          initialValue: selectedTimeSlot,
-                          items: timeSlots
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
+                          menuMaxHeight: 400,
+
+                          initialValue: selectedSlot?.id.toString(),
+
+
+                          dropdownColor: Colors.white,
+                          elevation: 3,
+                          borderRadius: BorderRadius.circular(10),
+
+                          items: availableSlots.map((slot) {
+                            return DropdownMenuItem(
+                              value: slot.id.toString(),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "${slot.startTime} - ${slot.endTime}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                   // fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+
                           onChanged: selectedDate == null
                               ? null
                               : (val) {
                             setState(() {
-                              selectedTimeSlot = val;
+                              selectedSlot = availableSlots.firstWhere(
+                                    (slot) => slot.id.toString() == val,
+                              );
                             });
                           },
+
                           decoration: InputDecoration(
                             labelText: "Time Slot",
 
+                            isDense: true, // 👈 height compact
+
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+
                             filled: true,
                             fillColor: Colors.grey.shade100,
-
-                            contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: Color(0xFF333333), width: 2),
@@ -217,24 +458,29 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: Color(0xFF0d6efd), width: 2),
                             ),
-
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
                           ),
+
                           hint: Text(
-                            selectedDate == null
+                            isSlotLoading
+                                ? "Loading slots..."
+                                : selectedDate == null
                                 ? "Select date first"
                                 : "Choose time",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              //fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
                         ),
-                      ),
+                      )
                     ],
                   ),
+
                   const SizedBox(height: 5),
 
                   /// 📝 Query
-                  inputField("Query", Icons.message, maxLines: 3),
+                  inputField("Query",controller: queryController, Icons.message, maxLines: 3),
 
                   const SizedBox(height: 20),
 
@@ -253,7 +499,7 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
                         shadowColor: Colors.transparent,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      onPressed: () {},
+                      onPressed: createBooking,
                       child: const Text(
                         "Proceed to Payment",
                         style: TextStyle(fontSize: 16,

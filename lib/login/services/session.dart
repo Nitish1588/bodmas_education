@@ -1,24 +1,91 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Session {
 
-  static Future<void> saveToken(String token) async {
-    try {
-      final pref = await SharedPreferences.getInstance();
-      await pref.setString("token", token);
-      print("TOKEN SAVED");
-    } catch (e) {
-      print("SAVE TOKEN ERROR: $e");
-    }
+  static String? token;
+  static Map<String, dynamic>? user;
+
+  /// =========================
+  /// SAVE TOKEN
+  /// =========================
+  static Future<void> saveToken(String t) async {
+    final pref = await SharedPreferences.getInstance();
+
+    await pref.setString("token", t);
+
+    token = t;
   }
 
+  /// =========================
+  /// GET TOKEN
+  /// =========================
   static Future<String?> getToken() async {
     final pref = await SharedPreferences.getInstance();
-    return pref.getString("token");
+
+    token = pref.getString("token");
+
+    return token;
   }
 
-  static Future<void> clear() async {
+  /// =========================
+  /// SAVE USER
+  /// =========================
+  static Future<void> saveUser(Map<String, dynamic>? u) async {
+
+    if (u == null) return;
+
     final pref = await SharedPreferences.getInstance();
-    await pref.clear();
+
+    await pref.setString("user", jsonEncode(u));
+
+    user = u;
+
+    print("USER SAVED");
+    print(user);
+  }
+
+  /// =========================
+  /// GET USER
+  /// =========================
+  static Future<Map<String, dynamic>?> getUser() async {
+
+    final pref = await SharedPreferences.getInstance();
+
+    String? userData = pref.getString("user");
+
+    if (userData != null) {
+
+      /// STRING -> MAP
+      user = jsonDecode(userData);
+
+      return user;
+    }
+
+    return null;
+  }
+
+  /// =========================
+  /// CHECK LOGIN
+  /// =========================
+  static Future<bool> isLogin() async {
+
+    String? t = await getToken();
+
+    return t != null;
+  }
+
+  /// =========================
+  /// CLEAR SESSION
+  /// =========================
+  static Future<void> clear() async {
+
+    final pref = await SharedPreferences.getInstance();
+
+    await pref.remove("token");
+    await pref.remove("user");
+
+    token = null;
+    user = null;
   }
 }

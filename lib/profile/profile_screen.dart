@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../login/login_screen.dart';
 import '../login/services/auth_service.dart';
 import '../login/services/session.dart';
 import '../widgets/app_snackbar.dart';
+import 'booking/booked_model.dart';
+import 'booking/booking_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,85 +14,34 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-/// Purchase Model
-class Purchase {
-  final String title;
-  final String date;
-  final String price;
-  final String status;
-
-  Purchase({
-    required this.title,
-    required this.date,
-    required this.price,
-    required this.status,
-  });
-}
-
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool isEditing = false;
 
-  final nameController = TextEditingController(text: "John Doe");
-  final phoneController = TextEditingController(text: "9876543210");
-  final emailController = TextEditingController(text: "john@gmail.com");
-  final addressController = TextEditingController(text: "Delhi, India");
-  final aboutController =
-  TextEditingController(text: "Student at Bodmas Education");
-  final dobController = TextEditingController(text: "12 Jan 2000");
+  final BookingController bookingController = BookingController();
+  List<BookingModel> bookings = [];
+  bool isLoading = true;
 
-  /// Dummy Purchases List
-  final List<Purchase> purchases = [
-    Purchase(
-        title: "Maths Crash Course",
-        date: "12 Feb 2025",
-        price: "₹999",
-        status: "Completed"),
-    Purchase(
-        title: "Physics Mentorship",
-        date: "05 Mar 2025",
-        price: "₹1499",
-        status: "Active"),
-  ];
 
-  Future<void> selectDate() async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2000),
-      firstDate: DateTime(1980),
-      lastDate: DateTime.now(),
-    );
+  @override
+  void initState() {
+    super.initState();
+    loadBookings();
+  }
 
-    if (picked != null) {
-      dobController.text = DateFormat('dd MMM yyyy').format(picked);
-      setState(() {});
+  Future<void> loadBookings() async {
+    try {
+      bookings = await bookingController.getBookings();
+    } catch (e) {
+      print("LOAD ERROR: $e");
     }
+
+    /// ALWAYS STOP LOADING
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  Widget buildField(String label, TextEditingController controller,
-      {bool enabled = true, VoidCallback? onTap}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.w600, color: Colors.grey)),
-        const SizedBox(height: 6),
-        TextField(
-          controller: controller,
-          enabled: enabled,
-          readOnly: onTap != null,
-          onTap: onTap,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: enabled ? Colors.white : Colors.grey.shade100,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+
+
 
   Widget buildViewTile(String label, String value, IconData icon) {
     return ListTile(
@@ -102,33 +53,240 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   /// Purchase Tile UI
-  Widget buildPurchaseTile(Purchase item) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
-        backgroundColor: Colors.blue.shade50,
-        child: Icon(Icons.school, color: Colors.blue),
+  Widget buildBookingCard(BookingModel item) {
+    final isOnline = item.type.toLowerCase() == "online";
+
+    Color statusColor =
+    item.status == "confirmed"
+        ? Colors.green
+        : item.status == "pending"
+        ? Colors.orange
+        : Colors.grey;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            Colors.blue.shade50,
+          //  Colors.purple.shade50,
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .06),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          )
+        ],
       ),
-      title: Text(item.title,
-          style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text("${item.date} • ${item.price}"),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: item.status == "Active"
-              ? Colors.green.shade100
-              : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          item.status,
-          style: TextStyle(
-            color: item.status == "Active"
-                ? Colors.green
-                : Colors.black54,
-            fontSize: 12,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          /// TOP
+          Row(
+            children: [
+
+              /// ICON
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF4A90E2),
+                      Color(0x344A90E2),
+                    ],
+                  ),
+                ),
+                child: const Icon(
+                  Icons.school_rounded,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              /// TITLE
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.course,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          size: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            "${item.date} • ${item.time}",
+                            maxLines: 2,
+                            softWrap: true,
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              /// STATUS
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Text(
+                  item.status.toUpperCase(),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
+
+          const SizedBox(height: 12),
+
+          /// TYPE + PRICE
+          Row(
+            children: [
+
+              /// TYPE
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isOnline
+                          ? Icons.wifi
+                          : Icons.location_on,
+                      size: 15,
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      item.type,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+
+              /// PRICE
+              Text(
+                "₹${item.price}",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF014C04),
+                ),
+              ),
+            ],
+          ),
+
+          /// LOCATION
+          if (!isOnline) ...[
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                Icon(
+                  Icons.place,
+                  size: 15,
+                  color: Colors.orange.shade700,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    item.location,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          /// ZOOM BUTTON
+          if (item.zoomLink != null &&
+              item.zoomLink!.trim().isNotEmpty) ...[
+            const SizedBox(height: 12),
+
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Colors.blue,
+                      Colors.purple,
+                    ],
+                  ),
+                ),
+                child: IconButton(
+                  onPressed: () async {
+                    final Uri url = Uri.parse(item.zoomLink!);
+
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.videocam,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -139,19 +297,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: const Color(0xFFF4F6FA),
       appBar: AppBar(
         title: const Text("Profile"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                isEditing = !isEditing;
-              });
-            },
-            child: Text(
-              isEditing ? "Save" : "Edit",
-              style: const TextStyle(color: Colors.white),
-            ),
-          )
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -168,26 +313,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 40,
-                    backgroundImage:
-                    NetworkImage("https://i.pravatar.cc/150?img=5"),
+                    backgroundImage: Session.user?["profile_photo"] != null &&
+                        Session.user!["profile_photo"].toString().isNotEmpty
+                        ? NetworkImage(Session.user!["profile_photo"])
+                        : null,
+                    child: Session.user?["profile_photo"] == null ||
+                        Session.user!["profile_photo"].toString().isEmpty
+                        ? Text(
+                      (Session.user?["name"] ?? "U")
+                          .toString()
+                          .substring(0, 1)
+                          .toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(nameController.text,
+                        Text(Session.user?["name"],
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        Text(phoneController.text,
+                        Text(Session.user?["number"],
                             style: const TextStyle(color: Colors.white70)),
                         const SizedBox(height: 4),
-                        Text(emailController.text,
+                        Text(Session.user?["email"],
                             style: const TextStyle(color: Colors.white70)),
                       ],
                     ),
@@ -196,47 +356,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
+
 
             /// 🔥 Details Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
+            if (
+            (Session.user?["address"] ?? "").toString().isNotEmpty ||
+                (Session.user?["gender"] ?? "").toString().isNotEmpty ||
+                (Session.user?["dob"] ?? "").toString().isNotEmpty
+            )
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
                       color: Colors.black12,
                       blurRadius: 10,
-                      offset: Offset(0, 4))
-                ],
+                      offset: Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    if ((Session.user?["address"] ?? "")
+                        .toString()
+                        .isNotEmpty)
+                      buildViewTile(
+                        "Address",
+                        Session.user?["address"],
+                        Icons.location_on,
+                      ),
+
+                    if ((Session.user?["gender"] ?? "")
+                        .toString()
+                        .isNotEmpty)
+                      buildViewTile(
+                        "About",
+                        Session.user?["gender"],
+                        Icons.info,
+                      ),
+
+                    if ((Session.user?["dob"] ?? "")
+                        .toString()
+                        .isNotEmpty)
+                      buildViewTile(
+                        "DOB",
+                        Session.user?["dob"],
+                        Icons.calendar_today,
+                      ),
+                  ],
+                ),
               ),
-              child: Column(
-                children: [
-                  if (!isEditing) ...[
-                    buildViewTile(
-                        "Address", addressController.text, Icons.location_on),
-                    buildViewTile(
-                        "About", aboutController.text, Icons.info),
-                    buildViewTile(
-                        "DOB", dobController.text, Icons.calendar_today),
-                  ] else ...[
-                    buildField("Name", nameController),
-                    const SizedBox(height: 12),
-                    buildField("Mobile", phoneController, enabled: false),
-                    const SizedBox(height: 12),
-                    buildField("Email", emailController),
-                    const SizedBox(height: 12),
-                    buildField("Address", addressController),
-                    const SizedBox(height: 12),
-                    buildField("About", aboutController),
-                    const SizedBox(height: 12),
-                    buildField("DOB", dobController,
-                        onTap: () => selectDate()),
-                  ]
-                ],
-              ),
-            ),
 
             const SizedBox(height: 20),
 
@@ -259,7 +430,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("My Purchases",
+                      const Text("My Bookings",
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       TextButton(
@@ -269,7 +440,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  ...purchases.map((e) => buildPurchaseTile(e)).toList()
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : bookings.isEmpty
+                      ? const Text("No bookings found")
+                      : Column(
+                    children: bookings.map((item) {
+                      return buildBookingCard(item);
+                    }).toList(),
+                  )
                 ],
               ),
             ),
@@ -319,6 +498,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
                         (route) => false,
                   );
+
+
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -326,6 +507,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text("Logout"),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  print(Session.user);
+                  print(Session.user?["id"]);
+                  print(Session.user?["name"]);
+
+
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text("demo check"),
               ),
             )
           ],
