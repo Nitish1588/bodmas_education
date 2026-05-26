@@ -1,19 +1,27 @@
+import 'package:bodmas_education/counsellingguidance/counsellingguidance_screen.dart';
+import 'package:bodmas_education/cutoff/cut_off.dart';
+import 'package:bodmas_education/education_loan_screen.dart';
+import 'package:bodmas_education/meeting/meeting_screen.dart';
+import 'package:bodmas_education/notification/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bodmas_education/Mentorship/mentorship.dart';
-import 'package:bodmas_education/profile/profile_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../widgets/customwebview_screen.dart';
 
 /// ✅ MODEL (No more Map errors)
 class ServiceModel {
   final String title;
   final IconData icon;
   final Color color;
-  final Widget screen;
+  final Widget? screen;
+  final String? url;
 
   ServiceModel({
     required this.title,
     required this.icon,
     required this.color,
-    required this.screen,
+    this.screen,
+    this.url,
   });
 }
 
@@ -32,45 +40,45 @@ class ServicesScreen extends StatelessWidget {
       title: "Counselling",
       icon: Icons.psychology,
       color: Colors.purple,
-      screen: const ProfileScreen(),
+      screen: const CounsellingGuidanceScreen(),
     ),
     ServiceModel(
       title: "Meeting",
       icon: Icons.person,
       color: Colors.orange,
-      screen: const ProfileScreen(),
+      screen: const MeetingScreen(),
     ),
     ServiceModel(
       title: "Mock Test",
       icon: Icons.smart_toy,
       color: Colors.green,
-      screen: const ProfileScreen(),
+      url: "https://mocktest.bodmaseducation.com/",
     ),
     ServiceModel(
       title: "Notification",
       icon: Icons.notifications,
       color: Colors.red,
-      screen: const ProfileScreen(),
+      screen: const NotificationScreen(),
     ),
     ServiceModel(
       title: "Loan",
       icon: Icons.account_balance,
       color: Colors.teal,
-      screen: const ProfileScreen(),
+      screen: const EducationLoanScreen(),
     ),
     ServiceModel(
       title: "Cutoff",
       icon: Icons.bar_chart,
       color: Colors.indigo,
-      screen: const ProfileScreen(),
+      screen: const CutOffScreen(),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FC),
 
+      backgroundColor: const Color(0xFFFBFDFF),
       /// APPBAR
       appBar: AppBar(
         title: const Text(
@@ -126,11 +134,33 @@ class _ServiceCardState extends State<_ServiceCard> {
       onTapDown: (_) => setState(() => scale = 0.93),
       onTapUp: (_) => setState(() => scale = 1),
       onTapCancel: () => setState(() => scale = 1),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => service.screen),
-        );
+      onTap: () async {
+        if (service.screen != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => service.screen!),
+          );
+        }
+        else if (service.url != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CustomWebViewScreen(
+                url: service.url!,
+                title: service.title,
+                enableCleaner: false,
+              ),
+            ),
+          );
+        }
+        else if (service.url != null) {
+          final uri = Uri.parse(service.url!);
+
+          if (await canLaunchUrl(uri)) {
+
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
       },
       child: AnimatedScale(
         duration: const Duration(milliseconds: 120),

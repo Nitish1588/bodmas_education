@@ -85,18 +85,22 @@ class BlogDetailScreen extends StatelessWidget {
                 "h4": Style(
                   fontSize: FontSize(14),
                   fontWeight: FontWeight.w600,
+
                 ),
                 "h5": Style(
                   fontSize: FontSize(14),
                   fontWeight: FontWeight.w600,
+
                 ),
 
                 "p": Style(
                   fontSize: FontSize(14),
+                  color: Colors.black,
                 ),
 
                 "li": Style(
                   fontSize: FontSize(13),
+                  color: Colors.black,
                 ),
 
                 /// TABLE STYLE

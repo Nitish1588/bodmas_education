@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../env.dart';
 
 class BookingService {
 
-  static const String url =
-      "https://bodmaseducation.com/api/v1/booking/my-bookings";
+  static final String url =
+      "${Env.baseUrl}/booking/my-bookings";
 
   static Future<List<dynamic>> fetchBookings(String token) async {
 

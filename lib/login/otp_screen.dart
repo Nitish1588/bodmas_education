@@ -7,16 +7,38 @@ import '../mainmenu/main_menu.dart';
 import 'widgets/custom_text_field.dart';
 
 
-class OTPScreen extends StatelessWidget {
+class OTPScreen extends StatefulWidget {
 
   final String phone;
 
   const OTPScreen({super.key, required this.phone});
 
   @override
+  State<OTPScreen> createState() => _OTPScreenState();
+}
+
+class _OTPScreenState extends State<OTPScreen> {
+
+  late TextEditingController otpController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    otpController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+
+    otpController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    TextEditingController otpController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +50,7 @@ class OTPScreen extends StatelessWidget {
         child: Column(
           children: [
 
-            Text("OTP sent to $phone"),
+            Text("OTP sent to ${widget.phone}"),
 
             const SizedBox(height: 20),
 
@@ -72,7 +94,7 @@ class OTPScreen extends StatelessWidget {
                     }
 
 
-                    var res = await AuthService.verifyOtp(phone, otpController.text);
+                    var res = await AuthService.verifyOtp(widget.phone, otpController.text);
 
                     if (res == null) {
                       AppSnackBar.show(context,
@@ -89,9 +111,6 @@ class OTPScreen extends StatelessWidget {
                       print("TYPE: $type");
 
                       if (type == "login") {
-
-                        AppSnackBar.show(context, message: "Login Successfully",
-                            type: SnackBarType.success);
 
                         // ✅ TOKEN ONLY FOR LOGIN
                         String token = res["token"];
@@ -110,6 +129,9 @@ class OTPScreen extends StatelessWidget {
                               (route) => false,
                         );
 
+                        AppSnackBar.show(context, message: "Login Successfully",
+                            type: SnackBarType.success);
+
                       } else if (type == "register") {
 
                         // ❌ TOKEN save
@@ -120,7 +142,7 @@ class OTPScreen extends StatelessWidget {
                           isScrollControlled: true,
                           isDismissible: false,
                           enableDrag: false,
-                          builder: (_) => UserInfoSheet(phone: phone),
+                          builder: (_) => UserInfoSheet(phone: widget.phone),
                         );
                       }
 

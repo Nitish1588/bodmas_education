@@ -5,17 +5,43 @@ import 'package:flutter/material.dart';
 import '../mainmenu/main_menu.dart';
 import 'widgets/custom_text_field.dart';
 
-class UserInfoSheet extends StatelessWidget {
+class UserInfoSheet extends StatefulWidget {
 
   final String phone;
 
-  const UserInfoSheet({super.key, required this.phone});
+  const UserInfoSheet({
+    super.key,
+    required this.phone,
+  });
+
+  @override
+  State<UserInfoSheet> createState() => _UserInfoSheetState();
+}
+
+class _UserInfoSheetState extends State<UserInfoSheet> {
+
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nameController = TextEditingController();
+    emailController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+
+    nameController.dispose();
+    emailController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    TextEditingController nameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
 
     return Padding(
       padding: EdgeInsets.only(
@@ -55,9 +81,32 @@ class UserInfoSheet extends StatelessWidget {
                   foregroundColor: const Color(0xFFFFFFFF), // White text
                 ),
               onPressed: () async {
+                String name = nameController.text.trim();
+                String email = emailController.text.trim();
 
+                if (name.isEmpty) {
+
+                  AppSnackBar.show(
+                    context,
+                    message: "Enter name",
+                    type: SnackBarType.warning,
+                  );
+
+                  return;
+                }
+
+                if (email.isEmpty || !email.contains("@")) {
+
+                  AppSnackBar.show(
+                    context,
+                    message: "Enter valid email",
+                    type: SnackBarType.error,
+                  );
+
+                  return;
+                }
                 var res = await AuthService.register(
-                  phone,
+                  widget.phone,
                   nameController.text,
                   emailController.text,
                 );

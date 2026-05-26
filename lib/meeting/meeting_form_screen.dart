@@ -1,5 +1,7 @@
 import 'package:bodmas_education/meeting/payment_screen.dart';
+import 'package:bodmas_education/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
+import '../env.dart';
 import 'field_widget.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -39,7 +41,7 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
     setState(() => isLoading = true);
 
     final response = await http.get(
-      Uri.parse("https://bodmaseducation.com/api/v1/courses"),
+      Uri.parse("${Env.baseUrl}/courses"),
     );
 
     if (response.statusCode == 200) {
@@ -70,7 +72,7 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
     setState(() => isSlotLoading = true);
 
     final response = await http.get(
-      Uri.parse("https://bodmaseducation.com/api/v1/time-slots?date=$date"),
+      Uri.parse("${Env.baseUrl}/time-slots?date=$date"),
     );
 
     if (response.statusCode == 200) {
@@ -120,9 +122,9 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
         selectedSlot == null ||
         selectedDate == null ||
         selectedMode == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill all required fields")),
-      );
+
+      AppSnackBar.show(context, message: "Please fill all required fields",type: SnackBarType.warning);
+
       return;
     }
 
@@ -142,7 +144,7 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
     };
 
     final response = await http.post(
-      Uri.parse("https://bodmaseducation.com/api/v1/booking/create"),
+      Uri.parse("${Env.baseUrl}/booking/create"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(body),
     );
@@ -180,9 +182,9 @@ class _MeetingFormScreenState extends State<MeetingFormScreen> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'])),
-      );
+
+      AppSnackBar.show(context, message: data['message'],type: SnackBarType.error);
+
     }
   }
   @override

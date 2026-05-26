@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../widgets/customwebview_screen.dart';
 
 class ManagementMentorshipScreen extends StatefulWidget {
   const ManagementMentorshipScreen({super.key});
@@ -105,18 +105,17 @@ class _ManagementMentorshipScreenState extends State<ManagementMentorshipScreen>
                       ),
                       child: const Text("Read More..."),
                       onPressed: () async {
-                        final Uri url = Uri.parse(
-                          'https://bodmaseducation.com/mentorship/mentorship-program-for-management',
-                        );
 
-                        try {
-                          await launchUrl(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        } catch (e) {
-                          //print('Error: $e');
-                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CustomWebViewScreen(
+                              url:
+                              'https://bodmaseducation.com/mentorship/mentorship-program-for-management',
+                              title: "Mentorship Program for Management",
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),

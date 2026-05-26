@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:bodmas_education/profile/profile_screen.dart';
+import 'package:bodmas_education/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
-
+import '../cutoff/service/payment_service.dart';
+import '../env.dart';
 import '../login/services/session.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -42,11 +45,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _onError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _onWallet);
 
-    Future.delayed(const Duration(milliseconds: 500), openPayment);
+    Future.delayed(const Duration(milliseconds: 100), openPayment);
   }
 
   // 🔥 OPEN PAYMENT
-  void openPayment() {
+  Future<void> openPayment() async {
+    String? key = await PaymentService.getRazorpayKey();
     debugPrint("========== OPEN PAYMENT ==========");
     print(Session.user);
     print(Session.user?["id"]);
@@ -66,26 +70,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
       debugPrint("❌ ERROR: Amount INVALID");
       return;
     }
-
+    debugPrint("razorpayKey** => $key");
     var options = {
-      // "key": "rzp_test_sjrrHSYgdgmQOv",
-      // "amount": 10000,
-      // "name": "Test",
-
-      "key": "rzp_test_sjrrHSYgdgmQOv",
+      "key": key,
       "amount": widget.amount,
       "order_id": widget.orderId,
       "currency": "INR",
-      "name": "Bodmas Education",
-      "description": "Consultation Booking",
       "prefill": {
         "contact": widget.phone,
         "email": widget.email,
       }
     };
 
+    debugPrint("ORDER ID (AAA): ${widget.orderId}");
+    debugPrint("amount (AAA): ${widget.amount}");
     try {
       _razorpay.open(options);
+      debugPrint("ORDER ID (BACKEND): ${widget.orderId}");
+      debugPrint("amount (BACKEND): ${widget.amount}");
       debugPrint("RAZORPAY OPEN : ");
     } catch (e) {
       debugPrint("❌ RAZORPAY OPEN ERROR: $e");
@@ -95,7 +97,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   // ✅ PAYMENT SUCCESS
   Future<void> _onSuccess(PaymentSuccessResponse response) async {
     final paymentId = response.paymentId;
-    final orderId = widget.orderId; // 👈 IMPORTANT (backend wala use karo)
+    final orderId = response.orderId; // 👈 IMPORTANT (backend wala use karo)
     final signature = response.signature;
 
 // DEBUG
@@ -126,9 +128,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       "module": "booking",
       "module_id": widget.bookingId.toString(),
 
-      "razorpay_order_id": orderId,        // 👈 FIXED
-      "razorpay_payment_id": paymentId,    // 👈 FIXED
-      "razorpay_signature": signature,     /// for temporary bases was "test_signature"
+      "razorpay_order_id": orderId,
+      "razorpay_payment_id": paymentId,
+      "razorpay_signature": signature,
 
       "amount": widget.amount,
       "name": widget.name,
@@ -141,7 +143,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     try {
       final res = await http.post(
-        Uri.parse("https://bodmaseducation.com/api/v1/payment/verify"),
+        Uri.parse("${Env.baseUrl}/payment/verify"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(body),
       );
@@ -163,17 +165,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (data['status'] == true) {
         debugPrint("✅ PAYMENT VERIFIED SUCCESS");
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Payment Successful")),
-        );
+        AppSnackBar.show(context, message: "Payment Successful",type: SnackBarType.success);
 
+        Navigator.push(context,
+        MaterialPageRoute(
+          builder: (_) => ProfileScreen(),
+        ),
+    );
         Navigator.popUntil(context, (route) => route.isFirst);
+
       } else {
+
         debugPrint("❌ VERIFY FAILED: ${data['message']}");
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? "Verify failed")),
-        );
+        AppSnackBar.show(context, message: data['message'] ?? "Verify failed",type: SnackBarType.error);
+
+        //ScaffoldMessenger.of(context).showSnackBar(
+       //   SnackBar(content: Text(data['message'] ?? "Verify failed")),
+       // );
+
       }
     } catch (e) {
       debugPrint("❌ VERIFY EXCEPTION: $e");
@@ -189,7 +199,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     try {
       final res = await http.post(
         Uri.parse(
-            "https://bodmaseducation.com/api/v1/payment/failure"),
+            "${Env.baseUrl}/payment/failure"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "booking_id": widget.bookingId,
@@ -202,9 +212,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       debugPrint("❌ FAILURE API ERROR: $e");
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Payment Failed")),
-    );
+    AppSnackBar.show(context, message: "Payment Failed",type: SnackBarType.error);
+
 
     Navigator.pop(context);
   }

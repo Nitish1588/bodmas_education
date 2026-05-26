@@ -1,32 +1,37 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../env.dart';
 
 class AuthService {
 
-  static const baseUrl = "https://bodmaseducation.com/api/v1/auth";
+  static final baseUrl = "${Env.baseUrl}/auth";
 
   // SEND OTP
   static Future<bool> sendOtp(String phone) async {
-    final res = await http.post(
-      Uri.parse("$baseUrl/send-otp"),
-      headers: {"Accept": "application/json"},
-      body: {"phone": phone},
-    );
 
-    final data = jsonDecode(res.body);
-    return data["status"] == true;
+    try {
+
+      final res = await http.post(
+        Uri.parse("$baseUrl/send-otp"),
+        headers: {"Accept": "application/json"},
+        body: {"phone": phone},
+      );
+
+      print("STATUS CODE: ${res.statusCode}");
+      print("BODY: ${res.body}");
+
+      final data = jsonDecode(res.body);
+
+      return data["status"] == true;
+
+    } catch (e) {
+
+      print("SEND OTP ERROR: $e");
+
+      return false;
+    }
   }
 
-  // VERIFY OTP
-  // static Future<Map<String, dynamic>?> verifyOtp(String phone, String otp) async {
-  //   final res = await http.post(
-  //     Uri.parse("$baseUrl/verify-otp"),
-  //     headers: {"Accept": "application/json"},
-  //     body: {"phone": phone, "otp": otp},
-  //   );
-  //
-  //   return jsonDecode(res.body);
-  // }
 
   static Future<Map<String, dynamic>?> verifyOtp(String phone, String otp) async {
     try {
@@ -50,19 +55,31 @@ class AuthService {
 
   // REGISTER
   static Future<Map<String, dynamic>?> register(
-      String phone, String name, String email) async {
+      String phone,
+      String name,
+      String email,
+      ) async {
 
-    final res = await http.post(
-      Uri.parse("$baseUrl/register"),
-      headers: {"Accept": "application/json"},
-      body: {
-        "phone": phone,
-        "name": name,
-        "email": email,
-      },
-    );
+    try {
 
-    return jsonDecode(res.body);
+      final res = await http.post(
+        Uri.parse("$baseUrl/register"),
+        headers: {"Accept": "application/json"},
+        body: {
+          "phone": phone,
+          "name": name,
+          "email": email,
+        },
+      );
+
+      return jsonDecode(res.body);
+
+    } catch (e) {
+
+      print("REGISTER ERROR: $e");
+
+      return null;
+    }
   }
 
 

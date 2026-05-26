@@ -7,7 +7,7 @@ class MeetingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFFBFDFF),
       appBar: AppBar(
         title: const Text("Meeting"),
 
@@ -109,8 +109,12 @@ class MeetingScreen extends StatelessWidget {
               height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B81F4), // Green background
-                  foregroundColor: const Color(0xFFFFFFFF), // White text
+                  elevation: 0,
+                  backgroundColor: const Color(0xFF2563EB),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: const Text("Book one to one session"),
                 onPressed: () {

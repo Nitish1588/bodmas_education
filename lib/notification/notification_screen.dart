@@ -3,17 +3,14 @@ import 'package:bodmas_education/notification/widgets/notification_skeleton.dart
 import 'package:flutter/material.dart';
 import 'notification_service.dart';
 
-
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  State<NotificationScreen> createState() =>
-      _NotificationScreenState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-
   late Future<List<dynamic>> futureData;
 
   int? selectedStateId;
@@ -73,21 +70,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.initState();
     futureData = NotificationService.fetchNotifications();
   }
+
   Future<void> refreshNotifications() async {
     setState(() {
       futureData = NotificationService.fetchNotifications();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFBFDFF),
       appBar: AppBar(
-        title: const Text("Notifications"), automaticallyImplyLeading: ModalRoute.of(context)?.canPop ?? false,),
+        title: const Text("Notifications"),
+        automaticallyImplyLeading: ModalRoute.of(context)?.canPop ?? false,
+      ),
 
       body: FutureBuilder<List<dynamic>>(
         future: futureData,
         builder: (context, snapshot) {
-
           // 🔥 LOADING
           if (snapshot.connectionState == ConnectionState.waiting) {
             return ListView.builder(
@@ -106,19 +107,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
           final data = snapshot.data!;
 
           // 🔥 SORT (latest first)
-          data.sort((a, b) => DateTime.parse(b['created_at'])
-              .compareTo(DateTime.parse(a['created_at'])));
+          data.sort(
+            (a, b) => DateTime.parse(
+              b['created_at'],
+            ).compareTo(DateTime.parse(a['created_at'])),
+          );
 
           // 🔥 FILTER
           final filteredData = selectedStateId == null
               ? data
-              : data
-              .where((e) => e['state_id'] == selectedStateId)
-              .toList();
+              : data.where((e) => e['state_id'] == selectedStateId).toList();
 
           return Column(
             children: [
-
               // 🔽 DROPDOWN
               Padding(
                 padding: const EdgeInsets.all(12),
@@ -129,8 +130,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   items: states.map((state) {
                     return DropdownMenuItem<int>(
@@ -148,16 +148,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
               // 🔽 LIST
               Expanded(
-          child: RefreshIndicator(
-          onRefresh: refreshNotifications,
-                child: ListView.builder(
-                  itemCount: filteredData.length,
-                  itemBuilder: (context, index) {
-                    return NotificationCard(
-                        data: filteredData[index]);
-                  },
+                child: RefreshIndicator(
+                  onRefresh: refreshNotifications,
+                  child: ListView.builder(
+                    itemCount: filteredData.length,
+                    itemBuilder: (context, index) {
+                      return NotificationCard(data: filteredData[index]);
+                    },
+                  ),
                 ),
-              ),)
+              ),
             ],
           );
         },

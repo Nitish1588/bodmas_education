@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../env.dart';
 
 class EventService {
-  static const String url = "https://bodmaseducation.com/api/events";
+  static String url = "${Env.baseUrlApi}/events";
   static const String imageBase = "https://bodmaseducation.com/images/events/";
 
   static Future<List<dynamic>> fetchEvents() async {

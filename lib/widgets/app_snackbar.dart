@@ -4,10 +4,10 @@ class AppSnackBar {
   static OverlayEntry? _currentEntry;
 
   static void show(
-      BuildContext context, {
-        required String message,
-        SnackBarType type = SnackBarType.info,
-      }) {
+    BuildContext context, {
+    required String message,
+    SnackBarType type = SnackBarType.info,
+  }) {
     _currentEntry?.remove(); // remove previous if exists
 
     final overlay = Overlay.of(context);
@@ -120,8 +120,7 @@ class _SnackBarWidgetState extends State<_SnackBarWidget>
           child: Material(
             color: Colors.transparent,
             child: Container(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: widget.color,
                 borderRadius: BorderRadius.circular(16),

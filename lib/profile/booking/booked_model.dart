@@ -7,6 +7,7 @@ class BookingModel {
   final String status;
   final String price;
   final String location;
+  final String createdAt;
   final String? zoomLink;
 
   BookingModel({
@@ -18,6 +19,7 @@ class BookingModel {
     required this.status,
     required this.price,
     required this.location,
+    required this.createdAt,
     this.zoomLink,
   });
 
@@ -31,6 +33,7 @@ class BookingModel {
       status: json["status"] ?? "",
       price: json["price"] ?? "",
       location: json["location"] ?? "",
+      createdAt: json["created_at"] ?? "",
       zoomLink: json["zoom_link"],
     );
   }

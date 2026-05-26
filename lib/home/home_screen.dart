@@ -1,7 +1,10 @@
+import 'package:bodmas_education/event/event_screen.dart';
+import 'package:bodmas_education/home/premium_carousel_widget.dart';
+import 'package:bodmas_education/home/quick_blog_section.dart';
+import 'package:bodmas_education/home/quick_event.dart';
+import 'package:bodmas_education/home/quick_notification_widget.dart';
 import 'package:flutter/material.dart';
-import '../blog/blog_service.dart';
-import '../blog/widgets/blog_card.dart';
-import '../blog/widgets/blog_card_skeleton.dart';
+import '../mainmenu/main_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,148 +14,92 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final List<Map<String, dynamic>> imageData = [
+    // {"image": "https://picsum.photos/id/1015/800/500"},
+    // {"image": "https://picsum.photos/id/1016/800/500"},
+    // {"image": "https://picsum.photos/id/1018/800/500"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/vwPGcE6eTnHoj2IWr4UB.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/pSF4wthqIjn02HIwy57O.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/XaxBYaRmARVzxlf3ZTME.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/inhy3sUQiA0JKj4jkolQ.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/vKLz9e9K6byHCxKuoalR.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/C9X210tBLtWYAQUkQyO9.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/QItE5iXNcL1q5v97Yv5S.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/UZuAsJvzNEzDkITXq3iI.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/ADMnbsoGGitC4CKHVrpL.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/l19LSYHNHSTCMqryA9T5.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/Qyas7DWiw7wXYYzSh2EO.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/8x9jFeUdG9VVO5W2NqJ1.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/ZkjFVGIsVGgd6F7yPsuT.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/0C3pkIlpcRtO7Xp4Ko6T.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/Du77nafTQdtyXcLGQ8yup7nwEW4iAoT13CVa6otI.jpg"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/iVxbsuF8udDeLUWEiWEy.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/B57XES7WbkwSeYz4atcy.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/opsHMIrqjg8qHzkfAZIL.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/KVTEjJXLY1OCQhX4uHlA.webp"},
+    {"image": "https://bodmaseducation.com/storage/hero_banners/AgoiOQa5gf9QAQSzeaDt.webp"}
 
-  List blogs = [];
-  bool initialLoading = true;
-  bool loadMoreLoading = false;
-  int page = 1;
-  bool isLoading = false;
-  bool hasMore = true;
-
-  Future<void> fetchBlogs() async {
-
-    if (loadMoreLoading || !hasMore) return;
-
-    if(page == 1){
-      initialLoading = true;
-    }else{
-      loadMoreLoading = true;
-    }
-
-    setState(() {});
-
-
-
-    final data = await BlogService.fetchBlogs(page);
-
-    List newBlogs = data["data"];
-
-    setState(() {
-
-      blogs.addAll(newBlogs);
-
-      if(data["next_page_url"] == null){
-        hasMore = false;
-      }else{
-        page++;
-      }
-
-      initialLoading = false;
-      loadMoreLoading = false;
-
-    });
-
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchBlogs();
-  }
-
+  ];
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-
+      backgroundColor: const Color(0xFFFBFDFF),
       appBar: AppBar(
         title: const Text("Home")),
 
-      body: Padding(
-        padding: const EdgeInsets.all(10),
+      body: SingleChildScrollView(
+        child: Padding(
+        padding: const EdgeInsets.all(1),
 
         child: Column(
           children: [
-
-
-            /// BLOG GRID
-            Expanded(
-
-              child: initialLoading
-
-              /// FIRST LOAD SKELETON
-
-                  ? GridView.builder(
-                itemCount: 10,
-
-                gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.9,
-                ),
-
-                itemBuilder: (context,index){
-
-                  return const BlogCardSkeleton();
-
-                },
-              )
-
-              /// BLOG LIST
-
-                  : GridView.builder(
-
-                itemCount: blogs.length +
-
-                    (loadMoreLoading ? 4 : 0),
-
-                gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.9,
-                ),
-
-                itemBuilder: (context,index){
-
-                  /// pagination skeleton
-
-                  if(index >= blogs.length){
-
-                    return const BlogCardSkeleton();
-
-                  }
-
-                  return BlogCard(
-                    blog: blogs[index],
-                  );
-
-                },
-              ),
+            PremiumCarouselWidget(
+              data: imageData,
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
-            /// LOAD MORE BUTTON
-            if(hasMore && !loadMoreLoading)
-              SizedBox(
-                width: double.infinity,
-                height: 35,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50), // Green background
-                    foregroundColor: const Color(0xFFFFFFFF), // White text
+            QuickNotificationSection(
+              onViewAll: () {
+
+                /// Navigate Notification Screen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MainMenu(initialIndex: 5),
                   ),
-                  onPressed: fetchBlogs,
-                  child: const Text("Load More"),
-                ),
-              )
+                );
+              },
+            ),
 
+            const SizedBox(height: 30),
+
+            QuickBlogSection(
+              onViewAll: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MainMenu(initialIndex: 6),
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 30),
+            QuickEventSection(
+              onViewAll: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const EventScreen(),
+                  ),
+                );
+              },
+            ),
           ],
         ),
+      ),
       ),
     );
   }

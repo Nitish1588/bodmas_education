@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../env.dart';
 
 class NotificationService {
-  static const String url =
-      "https://bodmaseducation.com/api/notifications";
+  static final String url =
+      "${Env.baseUrlApi}/notifications";
 
   static Future<List<dynamic>> fetchNotifications() async {
     final res = await http.get(Uri.parse(url));

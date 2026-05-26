@@ -4,14 +4,34 @@ import '../widgets/app_snackbar.dart';
 import 'widgets/custom_text_field.dart';
 import 'otp_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+
+  late TextEditingController phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    phoneController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+
+    phoneController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-
-    TextEditingController phoneController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Login")),
