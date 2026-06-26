@@ -25,7 +25,7 @@ class _EventScreenState extends State<EventScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Events")),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFBFDFF),
 
       body: FutureBuilder<List<dynamic>>(
         future: futureEvents,

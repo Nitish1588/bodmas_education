@@ -98,7 +98,7 @@ class _LawMentorshipScreenState extends State<LawMentorshipScreen> {
                     height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B81F4), // Green background
+                        backgroundColor: const Color(0xFF3B81F4),
                         foregroundColor: const Color(0xFFFFFFFF), // White text
                       ),
                       child: const Text("Read More..."),

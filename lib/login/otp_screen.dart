@@ -69,7 +69,7 @@ class _OTPScreenState extends State<OTPScreen> {
               height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4CAF50), // Green background
+                  backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: const Color(0xFFFFFFFF), // White text
                 ),
                 child: const Text("Verify OTP"),

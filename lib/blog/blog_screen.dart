@@ -66,6 +66,7 @@ class _BlogScreenState extends State<BlogScreen> {
 
         child: Column(
           children: [
+
             // SizedBox(
             //   width: double.infinity,
             //   height: 45,
@@ -127,6 +128,7 @@ class _BlogScreenState extends State<BlogScreen> {
               ),
             ),
             const SizedBox(height: 10),
+
 
             /// LOAD MORE BUTTON
             if (hasMore && !loadMoreLoading)

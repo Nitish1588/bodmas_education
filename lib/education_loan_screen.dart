@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class EducationLoanScreen extends StatelessWidget {
   // Network Image URL
   final String imageUrl =
-      "https://bodmaseducation.com/uploads/1758259268_Importance%20of%20Education%20Loans.png";
+      "https://bodmaseducation.com/storage/uploads/1758259268_Importance%20of%20Education%20Loans.png";
 
   const EducationLoanScreen({super.key});
 
@@ -124,13 +124,13 @@ class EducationLoanScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: const Color(0xFF2563EB),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
+                    elevation: 0,
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                   child: const Text(
                     'Read More...',
                     style: TextStyle(fontSize: 16),
@@ -141,9 +141,6 @@ class EducationLoanScreen extends StatelessWidget {
               // ===============================
               // TYPES OF EDUCATION LOANS SECTION
               // ===============================
-
-              // ISKO apne SingleChildScrollView ke andar add karo
-              // jaha previous section khatam ho raha hai uske niche paste karo
               const SizedBox(height: 30),
 
               const Text(
@@ -409,10 +406,7 @@ class EducationLoanScreen extends StatelessWidget {
 
                     SmallInterestCard(icon: Icons.home, title: "Collateral"),
 
-                    SmallInterestCard(
-                      icon: Icons.people,
-                      title: "Co-Applicant",
-                    ),
+                    SmallInterestCard(icon: Icons.people, title: "Co-Applicant",),
 
                     SmallInterestCard(icon: Icons.school, title: "Institution"),
                   ],
@@ -437,14 +431,14 @@ class EducationLoanScreen extends StatelessWidget {
                     );
                   },
 
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: const Color(0xFF2563EB),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
+                  ),
 
                   child: const Text(
                     'Read More...',

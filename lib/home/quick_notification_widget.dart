@@ -138,7 +138,7 @@ class _QuickNotificationSectionState extends State<QuickNotificationSection> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const SizedBox(
-        height: 260,
+        height: 160,
         child: Center(
           child: RotatingWaves(
             size: 150,
@@ -150,7 +150,7 @@ class _QuickNotificationSectionState extends State<QuickNotificationSection> {
     }
     if (hasError) {
       return SizedBox(
-        height: 260,
+        height: 160,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -243,7 +243,7 @@ class _QuickNotificationSectionState extends State<QuickNotificationSection> {
 
           /// NOTIFICATION LIST
           SizedBox(
-            height: 260,
+            height: 160,
             child: NotificationListener<UserScrollNotification>(
               onNotification: (notification) {
                 if (notification.direction != ScrollDirection.idle) {
@@ -336,7 +336,7 @@ class _QuickNotificationSectionState extends State<QuickNotificationSection> {
                                   InkWell(
                                     onTap: () {
                                       final pdfUrl =
-                                          "https://bodmaseducation.com/notice/${item['file']}";
+                                          "https://bodmaseducation.com/storage/notices/${item['file']}";
 
                                       downloadAndOpenPDF(pdfUrl);
                                     },

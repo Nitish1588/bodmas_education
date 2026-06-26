@@ -7,6 +7,7 @@ import 'package:bodmas_education/notification/notification_screen.dart';
 import 'package:bodmas_education/profile/profile_screen.dart';
 import 'package:bodmas_education/service/service.dart';
 import 'package:flutter/material.dart';
+import '../floating_social_menu.dart';
 
 class MainMenu extends StatefulWidget {
   final int initialIndex;
@@ -65,7 +66,20 @@ class _MainMenuState extends State<MainMenu> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFFBFDFF),
-        body: IndexedStack(index: selectedIndex, children: screens),
+        body: Stack(
+          children: [
+            IndexedStack(
+              index: selectedIndex,
+              children: screens,
+            ),
+
+            Positioned(
+              right: 8,
+              bottom: 10,
+              child: FloatingSocialMenu(),
+            ),
+          ],
+        ),
 
         bottomNavigationBar: CustomNavBar(
           selectedIndex: selectedIndex,

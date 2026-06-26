@@ -1,7 +1,6 @@
 import 'package:bodmas_education/starts/get_started.dart';
 import 'package:flutter/material.dart';
 import 'package:bodmas_education/mainmenu/main_menu.dart';
-import '../cutoff/service/payment_service.dart';
 import '../login/services/session.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -34,19 +34,13 @@ class NotificationCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-
-        // ✅ CARD RADIUS
         borderRadius: BorderRadius.circular(18),
-
-        // ✅ BORDER
         border: Border.all(
           color: const Color(0xFFE2E8F0),
         ),
-
-        // ✅ PREMIUM SHADOW
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -62,7 +56,6 @@ class NotificationCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ✅ TYPE TAG
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -114,7 +107,7 @@ class NotificationCard extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   final pdfUrl =
-                      "https://bodmaseducation.com/notice/${data['file']}";
+                      "https://bodmaseducation.com/storage/notices/${data['file']}";
 
                   downloadAndOpenPDF(pdfUrl);
                 },

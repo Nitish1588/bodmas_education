@@ -105,28 +105,34 @@ class MeetingScreen extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             SizedBox(
+              height: 50,
               width: double.infinity,
-              height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                child: const Text("Book one to one session"),
                 onPressed: () {
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const MeetingFormScreen()),
                   );
-
                 },
+                child: const Text(
+                  "Click Here to Book Meeting",
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
+
 
             SizedBox(height: 15),
 
@@ -193,7 +199,7 @@ class MeetingScreen extends StatelessWidget {
                 "Each interaction ensures students receive clarity, direction, and confidence in their decision-making.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontStyle: FontStyle.italic,
                   color: Color(0xFF3B82F6),
                 ),
@@ -281,12 +287,13 @@ class _BenefitCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 30, color: Color(0xFF3B82F6)),
+          Icon(icon, size: 25, color: Color(0xFF3B82F6)),
           const SizedBox(height: 10),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+
+            style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 13),
           ),
         ],
       ),

@@ -23,7 +23,7 @@ class EventCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.withAlpha(30),
+            color: Colors.blue.withAlpha(30),
             blurRadius: 10,
             offset: const Offset(0, 5),
           )
@@ -56,7 +56,7 @@ class EventCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: Color(0xFF0F172A),
                   ),
                 ),
 
@@ -65,7 +65,7 @@ class EventCard extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(Icons.location_on,
-                        size: 16, color: Colors.green),
+                        size: 16, color: Color(0xFF4C81F4)),
                     const SizedBox(width: 4),
                     Text(
                       event['location'],
@@ -74,7 +74,7 @@ class EventCard extends StatelessWidget {
 
                     const SizedBox(width: 20),
                     const Icon(Icons.date_range,
-                        size: 16, color: Colors.green),
+                        size: 16, color: Color(0xFF4C81F4)),
                     const SizedBox(width: 4),
                     Text(
                       date,

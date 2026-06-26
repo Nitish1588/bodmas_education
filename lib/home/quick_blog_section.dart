@@ -118,7 +118,7 @@ class _QuickBlogSectionState extends State<QuickBlogSection> {
         else
           /// BLOG LIST
           SizedBox(
-            height: 190,
+            height: 180,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),

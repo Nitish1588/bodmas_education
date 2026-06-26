@@ -1,4 +1,3 @@
-import 'package:bodmas_education/counsellingguidance/counsellingguidance_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../cutoff/model/purchased_cutoff_model.dart';
@@ -7,6 +6,7 @@ import '../cutoff/widgets/purchased_cutoff_card.dart';
 import '../login/login_screen.dart';
 import '../login/services/auth_service.dart';
 import '../login/services/session.dart';
+import '../notification-service.dart';
 import '../widgets/app_snackbar.dart';
 import 'booking/booked_model.dart';
 import 'booking/booking_controller.dart';
@@ -35,6 +35,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     loadPurchasedCutoffs();
   }
 
+  Future<void> openMap(String location) async {
+    final Uri url = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}',
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
+  }
+
   Future<void> loadBookings() async {
     setState(() {
       isLoading = true;
@@ -42,6 +52,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       bookings = await bookingController.getBookings();
+
+      for (var booking in bookings) {
+
+        /// Meeting datetime
+        DateTime meetingDateTime = DateFormat(
+          "yyyy-MM-dd hh:mm a",
+        ).parse(
+          "${booking.date} ${booking.time}",
+        );
+
+        /// Past meetings skip
+        if (meetingDateTime.isAfter(DateTime.now())) {
+
+          await NotificationService.scheduleMeetingReminder(
+            id: booking.id,
+            meetingTime: meetingDateTime,
+            course: booking.course,
+          );
+        }
+      }
+
     } catch (e) {
       print("LOAD ERROR: $e");
     }
@@ -260,11 +291,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Icon(Icons.place, size: 15, color: Colors.orange.shade700),
                 const SizedBox(width: 5),
                 Expanded(
-                  child: Text(
-                    item.location,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
+                  child: InkWell(
+                    onTap: () => openMap('28°35\'55.4"N 77°20\'37.4"E'),
+                    child: Text(
+                      item.location,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -490,10 +528,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFFE0ECFF),
-                      Color(0xFFD4E4FF),
-                    ],
+                    colors: [Color(0xFFE0ECFF), Color(0xFFD4E4FF)],
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -749,12 +784,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CounsellingGuidanceScreen(),
-                      ),
-                    );
+                    await NotificationService.showTestNotification();
+await NotificationService.showTestNotificationAfter5Sec();
+
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
